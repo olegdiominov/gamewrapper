@@ -31,7 +31,7 @@ async def main():
             selected_signal = signal.SIGCONT
         else:
             selected_resolution = default_resolution
-            selected_signal = signal.SIGTSTP
+            selected_signal = signal.SIGSTOP
         xrandr_process = await asyncio.create_subprocess_exec(
             'xrandr', '--size', selected_resolution,
             stdin=asyncio.subprocess.DEVNULL,
