@@ -33,17 +33,11 @@ async def main():
             selected_resolution = default_resolution
             selected_signal = signal.SIGSTOP
         xrandr_process = await asyncio.create_subprocess_exec(
-            'xrandr', '--size', selected_resolution,
-            stdin=asyncio.subprocess.DEVNULL,
-            stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL
+            'xrandr', '--size', selected_resolution
         )
         await xrandr_process.wait()
         killall_process = await asyncio.create_subprocess_exec(
-            'killall', '--signal', selected_signal.name, executable,
-            stdin=asyncio.subprocess.DEVNULL,
-            stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL
+            'killall', '--signal', selected_signal.name, executable
         )
         await killall_process.wait()
 
@@ -55,10 +49,7 @@ async def main():
         'wine', 'explorer', f'/desktop={selected_game},{game_resolution}',
         executable,
         cwd=workdir,
-        env={**os.environ, 'WINEPREFIX': prefix},
-        stdin=asyncio.subprocess.DEVNULL,
-        stdout=asyncio.subprocess.DEVNULL,
-        stderr=asyncio.subprocess.DEVNULL
+        env={**os.environ, 'WINEPREFIX': prefix}
     )
     await game_process.wait()
     i3_loop.cancel()
