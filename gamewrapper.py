@@ -35,11 +35,10 @@ async def main():
         xrandr_process = await asyncio.create_subprocess_exec(
             'xrandr', '--size', selected_resolution
         )
-        await xrandr_process.wait()
         killall_process = await asyncio.create_subprocess_exec(
             'killall', '--signal', selected_signal.name, executable
         )
-        await killall_process.wait()
+        await asyncio.gather(killall_process.wait(), xrandr_process.wait())
 
     i3 = await i3ipc.aio.Connection().connect()
     i3.on(i3ipc.Event.WINDOW, update)
