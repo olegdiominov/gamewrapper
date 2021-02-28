@@ -1,21 +1,20 @@
 import asyncio
 import os
 import signal
-import sys
+from argparse import ArgumentParser
 from configparser import ConfigParser
 from pathlib import Path
 
 import i3ipc.aio
 
 
-async def run_game():
+async def run_game(selected_game):
     config = ConfigParser()
     config_path = Path(
         os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config'),
         'gamewrapper', 'config.ini'
     )
     config.read(config_path)
-    selected_game = sys.argv[1]
 
     prefix = Path(config.get(selected_game, 'prefix')).expanduser()
     workdir = Path(prefix, config.get(selected_game, 'workdir'))
@@ -56,7 +55,10 @@ async def run_game():
 
 
 def main():
-    asyncio.run(run_game())
+    parser = ArgumentParser()
+    parser.add_argument('game')
+    args = parser.parse_args()
+    asyncio.run(run_game(args.game))
 
 
 if __name__ == '__main__':
