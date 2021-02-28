@@ -8,7 +8,7 @@ from pathlib import Path
 import i3ipc.aio
 
 
-async def main():
+async def run_game():
     config = ConfigParser()
     config_path = Path(
         os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config'),
@@ -55,5 +55,9 @@ async def main():
     await update(i3)
 
 
+def main():
+    asyncio.run(run_game())
+
+
 if __name__ == '__main__':
-    asyncio.run(main())
+    main()

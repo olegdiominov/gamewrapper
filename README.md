@@ -84,4 +84,5 @@ use `x` as separator. Make sure it's a valid `xrandr` mode.
 
 Make sure `wine`, `killall` and `xrandr` are available.
 
-Run `python -m gamewrapper <game>`, where `<game>` is the config section name.
+Run `python -m gamewrapper <game>` (or just `gamewrapper <game>` if installed),
+where `<game>` is the config section name.
