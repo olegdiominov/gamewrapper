@@ -1,6 +1,6 @@
 # gamewrapper
 
-Convenience tool for running older games with Wine and i3 window manager.
+Convenience tool for running some games with i3 window manager.
 
 ## Features
 
@@ -21,6 +21,10 @@ This means I have to run games manually, which requires setting `WINEPREFIX`
 variable and working directory (some games are picky about it). This tool helps
 me do it.
 
+The same command can also be used for running native games. This may be useful
+for DRM-free games downloaded into home directory or open-source games/game
+engines built from source.
+
 ### Resolution switching
 
 I often have problems with switching workspaces in i3 when running fullscreen
@@ -37,6 +41,9 @@ as a normal window as far as i3 is concerned.
 
 As a bonus, I can also set virtual desktop size per game even if they're in the
 same prefix, compared to doing it per prefix with `winecfg`.
+
+This also works with native games as long as they can run in a window of
+appropriate size.
 
 ### Pause/unpause
 
@@ -66,19 +73,26 @@ prefix = ~/wine/gog
 workdir = drive_c/GOG Games/Fallout 2
 exec = fallout2.exe
 resolution = 640x480
+
+[openmw]
+name = OpenMW
+workdir = ~/projects/openmw/build
+exec = ./openmw
 ```
 
 Each section other than `DEFAULT` defines one game.
 
 - `prefix` - absolute path to Wine prefix. `~` is expanded, environment
-variables are not.
+variables are not. Omit for native games.
 
-- `workdir` - path to working directory, relative to `prefix`.
+- `workdir` - path to working directory, relative to `prefix` for Wine games or
+absolute for native games.
 
 - `exec` - path to game executable, relative to `workdir`.
 
 - `resolution` - game resolution (or native resolution if `DEFAULT`). Always
-use `x` as separator. Make sure it's a valid `xrandr` mode.
+use `x` as separator. Make sure it's a valid `xrandr` mode. Game resolution can
+be omitted, in which case it falls back to `DEFAULT`.
 
 ## Usage
 

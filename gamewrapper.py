@@ -15,17 +15,26 @@ async def run_game(selected_game):
         'gamewrapper', 'config.ini'
     )
     config.read(config_path)
+    game_config = config[selected_game]
+    default_config = config['DEFAULT']
 
-    prefix = Path(config.get(selected_game, 'prefix')).expanduser()
-    workdir = Path(prefix, config.get(selected_game, 'workdir'))
-    executable = config.get(selected_game, 'exec')
-    game_resolution = config.get(selected_game, 'resolution')
-    default_resolution = config.get('DEFAULT', 'resolution')
+    if 'prefix' in game_config:
+        prefix = Path(game_config['prefix']).expanduser()
+        workdir = Path(prefix, game_config['workdir'])
+        window_title = f'{selected_game} - Wine desktop'
+    else:
+        prefix = None
+        workdir = Path(game_config['workdir']).expanduser()
+        window_title = game_config['name']
+    executable = game_config['exec']
+    process_name = Path(executable).name
+    game_resolution = game_config['resolution']
+    default_resolution = default_config['resolution']
 
     async def update(i3, e=None):
         tree = await i3.get_tree()
         workspace = tree.find_focused().workspace()
-        if workspace.find_named(f'{selected_game} - Wine desktop'):
+        if workspace.find_named(window_title):
             selected_resolution = game_resolution
             selected_signal = signal.SIGCONT
         else:
@@ -35,7 +44,7 @@ async def run_game(selected_game):
             'xrandr', '--size', selected_resolution
         )
         killall_process = await asyncio.create_subprocess_exec(
-            'killall', '--signal', selected_signal.name, executable
+            'killall', '--signal', selected_signal.name, process_name
         )
         await asyncio.gather(killall_process.wait(), xrandr_process.wait())
 
@@ -43,11 +52,18 @@ async def run_game(selected_game):
     i3.on(i3ipc.Event.WINDOW, update)
     i3_loop = asyncio.create_task(i3.main())
 
+    if prefix is not None:
+        game_args = [
+            'wine', 'explorer', f'/desktop={selected_game},{game_resolution}',
+            executable
+        ]
+        game_env = {**os.environ, 'WINEPREFIX': prefix}
+    else:
+        game_args = [executable]
+        game_env = None
+    print(workdir)
     game_process = await asyncio.create_subprocess_exec(
-        'wine', 'explorer', f'/desktop={selected_game},{game_resolution}',
-        executable,
-        cwd=workdir,
-        env={**os.environ, 'WINEPREFIX': prefix}
+        *game_args, cwd=workdir, env=game_env
     )
     await game_process.wait()
     i3_loop.cancel()
